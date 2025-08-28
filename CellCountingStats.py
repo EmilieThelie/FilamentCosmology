@@ -15,6 +15,10 @@ Input:
         Number of bins in length for the PDF of lengthes.
     Nbins_lenFraction: int
         Number of bins for the length fraction vs cell fraction statistics.
+    Nbins_cellCountingNcp: int
+        Number of bins in critical point number for the PDF.
+    Nbins_cpFraction: int
+        Number of bins for the critical point number fraction vs cell fraction statistics.
     grid_res: int
         Resolution of the cells. Multiple values can be given in the arguments.
     
@@ -23,7 +27,7 @@ This code generates a npz file containing:
 - Length fraction (percentage) vs cell fraction (percentage) with different resolution cube sizes.
 
 Example of a command line to run this script:
-    $ python CellCountingStats.py ./data/filament_path.pkl ./data/CellCountingStats 111 20 30 1 2 4 8 10
+    $ python CellCountingStats.py ./data/filament_path.pkl ./data/CellCountingStats 111 20 30 20 20 1 2 4 8 10
 """
 
 import sys
@@ -48,10 +52,16 @@ def read_input_args():
 
     Nbins_lenFraction = int(sys.argv[5])
     print(f"    > Number of bins for the length fraction vs cell fraction statistics: {Nbins_lenFraction}.")
+
+    Nbins_cellCountingNcp = int(sys.argv[6])
+    print(f"    > Number of bins in critical point number for the PDF: {Nbins_cellCountingNcp}.")
+
+    Nbins_cpFraction = int(sys.argv[7])
+    print(f"    > Number of bins for the critical point number fraction vs cell fraction statistics: {Nbins_cpFraction}.")    
     
-    grid_res = [int(arg) for arg in sys.argv[6:]]
+    grid_res = [int(arg) for arg in sys.argv[8:]]
     print(f"    > Coarse resolution of the cells: {grid_res} cMpc (or cMpc/h).")
-    return filepath_filaments, filename_output, Lbox, Nbins_cellCountingLen, Nbins_lenFraction, grid_res
+    return filepath_filaments, filename_output, Lbox, Nbins_cellCountingLen, Nbins_lenFraction, Nbins_cellCountingNcp, Nbins_cpFraction, grid_res
     
 
 ##### To read filaments
@@ -87,6 +97,8 @@ def read_filaments_data(filepath_filaments):
     pos_fil = np.array(pos_fil)
     Nfil = len(np.unique(id_fil))
     print(f"    > There are {Nfil} filaments and {len(id_fil)} filament segments.")
+    print(f"    > There are {np.unique(pos_fil[(np.where(crit_fil==2)[0])],axis=0).shape[0]} critical points of index 2.")
+    print(f"    > There are {np.unique(pos_fil[(np.where(crit_fil==3)[0])],axis=0).shape[0]} critical points of index 3 (maxima).")
     return id_fil, crit_fil, pos_fil
 
 
@@ -172,6 +184,31 @@ def generate_fillength_grid(Lbox,pos_filseg_midpoint,filseg_length):
     print(f"    > Check of the total length of filaments inside the grid with dx=1: {np.sum(length_grid):.2f} cMpc or cMpc/h.")
     return length_grid
 
+def generate_critptcount_grid(Ncells,which_crittype,crit_fil,pos_fil):
+    """
+    Generate a grid of resolution 1 cMpc (or cMpc/h according to Lbox) that contains the number of critical points of a given critical index.
+    Input:
+        Lbox: int
+            Physical size of the simulation box from which the filaments come from.
+        which_crittype: int
+            Critical index of critical points, should be 0 (minima), 1, 2, or 3 (maxima) for 3D data.
+        crit_fil: 1D array
+            Critical type index of the points. 
+        pos_fil: 2D array
+            3D position of all filaments points.
+    Output: 3D array
+        Grid containing the length of all filament falling into the cells.
+    """
+    pos_critpt = np.unique(pos_fil[(np.where(crit_fil==which_crittype)[0])],axis=0)
+    pos_critpt_in_cell = np.int64(np.floor(pos_critpt))
+    
+
+    critpt_grid = np.zeros((Ncells,Ncells,Ncells))
+    for i_bit in range(pos_critpt_in_cell.shape[0]):
+        critpt_grid[tuple(pos_critpt_in_cell[i_bit])] += 1
+
+    return critpt_grid
+
 def block_sum(grid, dx):
     """
     Perform a summation of cells values over cubic kernels of a given resolution.
@@ -196,19 +233,19 @@ def block_sum(grid, dx):
 
 
 ##### To compute cell counting statistics
-def compute_cellCountingLen(grids,Nbins):
+def compute_cellCountingStat(grids,Nbins):
     """
-    Compute the PDF of filament length within the cells.
+    Compute the PDF of the gridded quantity within the cells.
     Input:
         grids: list
-            3D grids of filament lengths for the different cell resolution.
+            3D grids of some quantity (e.g. filament length or number of critical points) for the different cell resolution.
         Nbins: int
-            Number of bins in length of the PDF.
+            Number of bins for the PDF.
     Output:
-        bins_len: 1D array
-            Bins of lengths (in units of Lbox units).
-        cellCountingLen: 2D array
-            PDF of filament length within the cells (in units of 1/Lbox units), for every cell resolution.
+        bins: 1D array
+            Bins of the PDF (in units of the gridded quantity).
+        cellCountingStat: 2D array
+            PDF of the gridded quantity within the cells (in units of the gridded quantity), for every cell resolution.
     """
     bins_cellCountingLen = np.linspace(1e-5,20,Nbins)
     bins_len = bins_cellCountingLen[:-1]*0.5+bins_cellCountingLen[1:]*0.5
@@ -219,30 +256,30 @@ def compute_cellCountingLen(grids,Nbins):
 
     return bins_len, cellCountingLen
 
-def compute_length_fraction(grids, Nbins):
+def compute_quantity_fraction(grids, Nbins):
     """
-    Compute the length fraction with respect to the cell fraction.
+    Compute the quantity fraction with respect to the cell fraction.
     Input:
         grids: list
-            3D grids of filament lengths for the different cell resolution.
+            3D grids of some quantity (e.g. filament length or number of critical points) for the different cell resolution.
         Nbins: int
             Number of bins in cell fraction.
     Output:
         cell_fraction: 1D array
             Cell percentage.
-        length_fraction: 2D array
-            Percentage of filament length there is in a given percentage of cells, for every cell resolution.
+        qty_fraction: 2D array
+            Percentage of the quantity there is in a given percentage of cells, for every cell resolution.
     """
     cell_fraction = np.linspace(0,100,Nbins)
 
-    length_fraction = np.zeros((len(grids),Nbins))
+    qty_fraction = np.zeros((len(grids),Nbins))
     for i in range(len(grids)):
         for j in range(len(cell_fraction)):
             grid = grids[i]
-            total_length = np.sum(grid)
-            length_fraction[i,j] = np.sum(grid[ grid >= np.percentile(grid,100-cell_fraction[j]) ]) / total_length * 100
+            total = np.sum(grid)
+            qty_fraction[i,j] = np.sum(grid[ grid >= np.percentile(grid,100-cell_fraction[j]) ]) / total * 100
 
-    return cell_fraction, length_fraction
+    return cell_fraction, qty_fraction
 
 
 
@@ -251,7 +288,7 @@ if __name__ == "__main__":
     global_start_time = time.time()
     
     print("***** Reading parameters *****")
-    filepath_filaments, filename_output, Lbox, Nbins_cellCountingLen, Nbins_lenFraction, grid_res = read_input_args()
+    filepath_filaments, filename_output, Lbox, Nbins_cellCountingLen, Nbins_lenFraction, Nbins_cellCountingNcp, Nbins_cpFraction, grid_res = read_input_args()
 
     print("\n***** Reading filaments *****")
     id_fil, crit_fil, pos_fil = read_filaments_data(filepath_filaments)
@@ -259,7 +296,7 @@ if __name__ == "__main__":
     print("\n***** Computing length and midpoint of filament segments *****")
     id_filseg, pos_filseg_midpoint, filseg_length, fil_length = compute_fil_length_midpoint(pos_fil,id_fil)
 
-    print("\n***** Generating grids *****")
+    print("\n***** Generating filament length grids *****")
     grid_fillength = generate_fillength_grid(Lbox,pos_filseg_midpoint,filseg_length)
     grid_fillength_allres = []
     for dx in grid_res:
@@ -269,13 +306,32 @@ if __name__ == "__main__":
             grid_fillength_allres.append(block_sum(grid_fillength,dx))
             print(f"    > Check of the total length of filaments inside the grid with dx={dx}: {np.sum(grid_fillength_allres[-1]):.2f} cMpc (or cMpc/h).")
 
+    print("\n***** Generating critical point number grids *****")
+    grid_cp2, grid_cp3 = generate_critptcount_grid(Lbox,2,crit_fil,pos_fil), generate_critptcount_grid(Lbox,3,crit_fil,pos_fil)
+    grid_cp2_allres, grid_cp3_allres = [], []
+    for dx in grid_res:
+        if dx==1:
+            grid_cp2_allres.append(grid_cp2)
+            grid_cp3_allres.append(grid_cp3)
+        else:
+            grid_cp2_allres.append(block_sum(grid_cp2,dx))
+            print(f"    > Check of the total number of critical point of index 2 inside the grid with dx={dx}: {np.sum(grid_cp2_allres[-1]):.2f}.")
+            grid_cp3_allres.append(block_sum(grid_cp3,dx))
+            print(f"    > Check of the total number of critical point of index 3 inside the grid with dx={dx}: {np.sum(grid_cp3_allres[-1]):.2f}.")
+
     print("\n***** Computing and saving cell counting statistics *****")
-    bins_len, cellCountingLen = compute_cellCountingLen(grid_fillength_allres,Nbins_cellCountingLen)
-    cell_fraction, length_fraction_allres = compute_length_fraction(grid_fillength_allres, Nbins_lenFraction)
+    bins_len, cellCountingLen = compute_cellCountingStat(grid_fillength_allres,Nbins_cellCountingLen)
+    cell_fraction, length_fraction_allres = compute_quantity_fraction(grid_fillength_allres, Nbins_lenFraction)
+    
+    bins_cp2, cellCountingcp2 = compute_cellCountingStat(grid_cp2_allres,Nbins_cellCountingNcp)
+    bins_cp3, cellCountingcp3 = compute_cellCountingStat(grid_cp3_allres,Nbins_cellCountingNcp)
+    cell_fraction_cp2, cp2_fraction_allres = compute_quantity_fraction(grid_cp2_allres, Nbins_cpFraction)
+    cell_fraction_cp3, cp3_fraction_allres = compute_quantity_fraction(grid_cp3_allres, Nbins_cpFraction)
 
     np.savez(filename_output,
-             bins_len=bins_len,cellCountingLen=cellCountingLen,
-             cell_fraction=cell_fraction,length_fraction_allres=length_fraction_allres)
+             bins_len=bins_len,cellCountingLen=cellCountingLen,cell_fraction=cell_fraction,length_fraction_allres=length_fraction_allres,
+             bins_cp2=bins_cp2,cellCountingcp2=cellCountingcp2,cell_fraction_cp2=cell_fraction_cp2,cp2_fraction_allres=cp2_fraction_allres,
+             bins_cp3=bins_cp3,cellCountingcp3=cellCountingcp3,cell_fraction_cp3=cell_fraction_cp3,cp3_fraction_allres=cp3_fraction_allres)
     
     print(f"\n***** Total run time: {time.time()-global_start_time:.2f}s *****")
 
