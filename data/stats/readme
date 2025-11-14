@@ -1,0 +1,15 @@
+The files are named c***_c*_stats.npz, for cosmology and persistence threshold cut.
+Load them with np.load('cxxx_results/c***_c*_stats.npz').
+In each file, the entries are 
+    l_tot: the total length of the entire web, 1 number
+    l_arr: the array of individual filament lengths, array length is N_filament
+    curve_ratio: the array of curve ratios, defined as the filament length (path distance) divided by the straight distance between the 2 ends of the filament, array length is N_filament
+    nfil_per_node: the array of numbers of filaments connected to individual nodes, array length is N_node
+    distances_all_no_truncation: the array of galaxy distances to closest filament, without cuts, array length is N_galaxy
+    distances_all: the array of galaxy distances to closest filament, keeping only distances smaller than 5Mpc/h, array length is N_galaxy_close_to_filament. Galaxies more than 5Mpc/h away from the closest filament are excluded from the statistics below.
+    richness: the array of how many galaxies are associated with each individual filament (a galaxy can be associated with multiple filaments if the closest segment belongs to more than 1 filament), array length is N_filament
+    dist_2: the array of path distances between the 2-saddle point and the closest point on the filament for each galaxy, array length is N_galaxy_close_to_filament
+    dist_3: the array of path distances between the node and the closest point on the filament for each galaxy, array length is N_galaxy_close_to_filament
+    corr_len_richness: the correlation coefficient between l_arr and richness, 1 number
+    richness_per_length: richness divided by l_arr, array length is N_filament
+As of 11/14/25, all lengths and distances here are in units of Mpc (as opposed to Mpc/h). However, the galaxy-filament distance truncation is done at 5Mpc/h.
