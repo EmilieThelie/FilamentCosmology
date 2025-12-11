@@ -55,11 +55,11 @@ boxsize = float(args.boxsize)
 nthreads = 4
 binfile = path.abspath(str(args.binfile))
 
-results_SS = countpairs(1, nthreads, binfile, X1=saddles_pos[:,0], Y1=saddles_pos[:,1], Z1=saddles_pos[:,2], verbose=True)[0]
-results_SN = countpairs(0, nthreads, binfile, X1=saddles_pos[:,0], Y1=saddles_pos[:,1], Z1=saddles_pos[:,2], X2=nodes_pos[:,0], Y2=nodes_pos[:,1], Z2=nodes_pos[:,2], verbose=True)[0]
-results_SG = countpairs(0, nthreads, binfile, X1=saddles_pos[:,0], Y1=saddles_pos[:,1], Z1=saddles_pos[:,2], X2=gals_pos[:,0],  Y2=gals_pos[:,1],  Z2=gals_pos[:,2], verbose=True)[0]
-results_NN = countpairs(1, nthreads, binfile, X1=nodes_pos[:,0],   Y1=nodes_pos[:,1],   Z1=nodes_pos[:,2], verbose=True)[0]
-results_GG = countpairs(1, nthreads, binfile, X1=gals_pos[:,0],    Y1=gals_pos[:,1],    Z1=gals[:,2], verbose=True)[0]
+results_SS = countpairs(1, nthreads, binfile, X1=saddles_pos[:,0].astype(np.float32), Y1=saddles_pos[:,1].astype(np.float32), Z1=saddles_pos[:,2].astype(np.float32), verbose=True)[0]
+results_SN = countpairs(0, nthreads, binfile, X1=saddles_pos[:,0].astype(np.float32), Y1=saddles_pos[:,1].astype(np.float32), Z1=saddles_pos[:,2].astype(np.float32), X2=nodes_pos[:,0].astype(np.float32), Y2=nodes_pos[:,1].astype(np.float32), Z2=nodes_pos[:,2].astype(np.float32), verbose=True)[0]
+results_SG = countpairs(0, nthreads, binfile, X1=saddles_pos[:,0].astype(np.float32), Y1=saddles_pos[:,1].astype(np.float32), Z1=saddles_pos[:,2].astype(np.float32), X2=gals_pos[:,0].astype(np.float32),  Y2=gals_pos[:,1].astype(np.float32),  Z2=gals_pos[:,2].astype(np.float32), verbose=True)[0]
+results_NN = countpairs(1, nthreads, binfile, X1=nodes_pos[:,0].astype(np.float32),   Y1=nodes_pos[:,1].astype(np.float32),   Z1=nodes_pos[:,2].astype(np.float32), verbose=True)[0]
+results_GG = countpairs(1, nthreads, binfile, X1=gals_pos[:,0].astype(np.float32),    Y1=gals_pos[:,1].astype(np.float32),    Z1=gals[:,2].astype(np.float32), verbose=True)[0]
 
 xi_SS = []
 xi_SN = []
