@@ -91,6 +91,7 @@ while i < len(results_SS):
   RR_SG = Ns*Ng*(4./3.)*np.pi*(results_SG[i][1]**3.0 - results_SG[i][0]**3.0) / boxsize**3.0
   RR_NN = 0.5*Nn*Nn*(4./3.)*np.pi*(results_NN[i][1]**3.0 - results_NN[i][0]**3.0) / boxsize**3.0
   RR_GG = 0.5*Ng*Ng*(4./3.)*np.pi*(results_GG[i][1]**3.0 - results_GG[i][0]**3.0) / boxsize**3.0
+  print(results_GG[i][3])
   
   xi_SS.append((results_SS[i][3]/RR_SS) - 1.)
   xi_SN.append((results_SN[i][3]/RR_SN) - 1.)
