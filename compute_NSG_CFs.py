@@ -43,7 +43,7 @@ gals  = np.genfromtxt(args.galfile)
 
 Ng = len(gals)
 
-gals_pos = np.vstack(gals[:,2], gals[:,0], gals[:,1]).T #axis flipping, not certain this is correct
+gals_pos = np.vstack([gals[:,2], gals[:,0], gals[:,1]]).T #axis flipping, not certain this is correct
 
 #***************************************************************************
 #***************************************************************************
