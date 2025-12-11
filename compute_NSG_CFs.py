@@ -53,7 +53,7 @@ gals_pos = np.vstack([gals[:,2], gals[:,0], gals[:,1]]).T #axis flipping, not ce
 
 boxsize = float(args.boxsize)
 nthreads = 4
-binfile = path.abspath(str(args.bin_file))
+binfile = path.abspath(str(args.binfile))
 
 results_SS = countpairs(1, nthreads, binfile, X1=x1, Y1=y1, Z1=z1, verbose=True)[0]
 results_SN = countpairs(0, nthreads, binfile, X1=x1, Y1=y1, Z1=z1, X2=x2, Y2=y2, Z2=z2, verbose=True)[0]
