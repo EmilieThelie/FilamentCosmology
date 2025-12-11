@@ -34,7 +34,9 @@ saddles = crits[maskS]
 nodes   = crits[maskN]
 
 Ns = len(saddles)
+print(Ns)
 Nn = len(nodes)
+print(Nn)
 
 saddles_pos = np.vstack([saddles['X0'], saddles['X1'], saddles['X2']]).T
 nodes_pos   = np.vstack([  nodes['X0'],   nodes['X1'],   nodes['X2']]).T
