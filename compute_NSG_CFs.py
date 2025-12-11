@@ -48,6 +48,14 @@ print(Ng)
 
 gals_pos = np.vstack([gals[:,2], gals[:,0], gals[:,1]]).T #axis flipping, not certain this is correct
 
+print(min(saddles_pos[:,0]))
+print(min(saddles_pos[:,1]))
+print(min(saddles_pos[:,2]))
+
+print(min(nodes_pos[:,0]))
+print(min(nodes_pos[:,1]))
+print(min(nodes_pos[:,2]))
+
 #***************************************************************************
 #***************************************************************************
 #******************** Calculating correlation functions ******************** 
