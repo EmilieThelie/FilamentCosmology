@@ -44,6 +44,7 @@ nodes_pos   = np.vstack([  nodes['X0'],   nodes['X1'],   nodes['X2']]).T
 gals  = np.genfromtxt(args.galfile)
 
 Ng = len(gals)
+print(Ng)
 
 gals_pos = np.vstack([gals[:,2], gals[:,0], gals[:,1]]).T #axis flipping, not certain this is correct
 
