@@ -86,11 +86,11 @@ rmax = []
 
 i = 0
 while i < len(results_SS):
-  RR_SS = Ns*Ns*(4./3.)*np.pi*(results_SS[i][1]**3.0 - results_SS[i][0]**3.0) / boxsize**3.0
+  RR_SS = 2*Ns*Ns*(4./3.)*np.pi*(results_SS[i][1]**3.0 - results_SS[i][0]**3.0) / boxsize**3.0
   RR_SN = Ns*Nn*(4./3.)*np.pi*(results_SN[i][1]**3.0 - results_SN[i][0]**3.0) / boxsize**3.0
   RR_SG = Ns*Ng*(4./3.)*np.pi*(results_SG[i][1]**3.0 - results_SG[i][0]**3.0) / boxsize**3.0
-  RR_NN = Nn*Nn*(4./3.)*np.pi*(results_NN[i][1]**3.0 - results_NN[i][0]**3.0) / boxsize**3.0
-  RR_GG = Ng*Ng*(4./3.)*np.pi*(results_GG[i][1]**3.0 - results_GG[i][0]**3.0) / boxsize**3.0
+  RR_NN = 2*Nn*Nn*(4./3.)*np.pi*(results_NN[i][1]**3.0 - results_NN[i][0]**3.0) / boxsize**3.0
+  RR_GG = 2*Ng*Ng*(4./3.)*np.pi*(results_GG[i][1]**3.0 - results_GG[i][0]**3.0) / boxsize**3.0
   
   xi_SS.append((results_SS[i][3]/RR_SS) - 1.)
   xi_SN.append((results_SN[i][3]/RR_SN) - 1.)
