@@ -27,8 +27,8 @@ dtype = [('X0', 'f4'), ('X1', 'f4'), ('X2', 'f4'),('value', 'f4'),
 
 crits = np.genfromtxt(args.critfile, dtype=dtype, comments='#')
 
-maskS = crits['type']==2 and crits['X0']>0.0 and crits['X1']>0.0 and crits['X2']>0.0
-maskN = crits['type']==3 and crits['X0']>0.0 and crits['X1']>0.0 and crits['X2']>0.0
+maskS = np.where( (crits['type']==2) & (crits['X0']>0.0) & (crits['X1']>0.0) & (crits['X2']>0.0))
+maskN = np.where( (crits['type']==3) & (crits['X0']>0.0) & (crits['X1']>0.0) & (crits['X2']>0.0))
 
 saddles = crits[maskS]
 nodes   = crits[maskN]
