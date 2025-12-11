@@ -36,9 +36,9 @@ maskN = crits['type']==3
 saddles = crits[maskS]
 nodes   = crits[maskN]
 
-Ns = len(saddles)
+Ns = float(len(saddles))
 print(Ns)
-Nn = len(nodes)
+Nn = float(len(nodes))
 print(Nn)
 
 saddles_pos = np.vstack([saddles['X0'], saddles['X1'], saddles['X2']]).T
@@ -46,7 +46,7 @@ nodes_pos   = np.vstack([  nodes['X0'],   nodes['X1'],   nodes['X2']]).T
                          
 gals  = np.genfromtxt(args.galfile)
 
-Ng = len(gals)
+Ng = float(len(gals))
 print(Ng)
 
 gals_pos = np.vstack([gals[:,2], gals[:,0], gals[:,1]]).T #axis flipping, not certain this is correct
@@ -92,11 +92,11 @@ while i < len(results_SS):
   RR_NN = Nn*Nn*(4./3.)*np.pi*(results_NN[i][1]**3.0 - results_NN[i][0]**3.0) / boxsize**3.0
   RR_GG = Ng*Ng*(4./3.)*np.pi*(results_GG[i][1]**3.0 - results_GG[i][0]**3.0) / boxsize**3.0
   
-  xi_SS.append(results_SS[i][3]/RR_SS - 1.)
-  xi_SN.append(results_SN[i][3]/RR_SN - 1.)
-  xi_SG.append(results_SG[i][3]/RR_SG - 1.)
-  xi_NN.append(results_NN[i][3]/RR_NN - 1.)
-  xi_GG.append(results_GG[i][3]/RR_GG - 1.)
+  xi_SS.append((results_SS[i][3]/RR_SS) - 1.)
+  xi_SN.append((results_SN[i][3]/RR_SN) - 1.)
+  xi_SG.append((results_SG[i][3]/RR_SG) - 1.)
+  xi_NN.append((results_NN[i][3]/RR_NN) - 1.)
+  xi_GG.append((results_GG[i][3]/RR_GG) - 1.)
   rmin.append(results_SS[i][0])
   rmax.append(results_SS[i][1])
   
