@@ -52,6 +52,7 @@ gals_pos = np.vstack([gals[:,2], gals[:,0], gals[:,1]]).T #axis flipping, not ce
 #***************************************************************************
 
 boxsize = float(args.boxsize)
+print(boxsize)
 nthreads = 4
 binfile = path.abspath(str(args.binfile))
 
